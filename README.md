@@ -54,6 +54,44 @@ make tests
 make gofuzz
 ```
 
+## Runing memory and cpu profiling
+### Prerequisites
+You will need to install graphviz:
+```bash
+apt-get install graphviz
+```
+Or if you are in mac:
+```bash
+brew install graphviz
+```
+
+### Generate the profiling data
+Run promhouse with either cpu or mem profiling enabled by running it with:
+```bash
+make run-memprofile
+```
+Or
+```bash
+make run-cpuprofile
+```
+Run any tests you want to profile (for example, generating some load), and stop promhouse. You will see where the pprof file is created in an output like this:
+```
+promhouse --log.level=info --profile.mem
+stdlog: profile: memory profiling enabled (rate 4096), /tmp/profile371198043/mem.pprof
+```
+The profiling needs some data. If you do not run it for long enough (allow it at least 30 secs or so), you won't get enough data and the profiling won't work.
+
+NOTE: the promhouse binary needs to be in your path. That would probably look like this:
+```bash
+export PATH="${GOPATH}/bin:$PATH"
+```
+
+### Graph the gathered data
+You can now use [pprof](https://github.com/google/pprof) to read the data. The quickest way I found is to generate a pdf:
+```bash
+go tool pprof --pdf ${GOPATH}/bin/promhouse /tmp/profile382238388/mem.pprof > profilegraph.pdf
+```
+
 ## Database Schema
 
 ```sql
