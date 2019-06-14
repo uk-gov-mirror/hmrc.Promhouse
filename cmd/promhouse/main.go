@@ -30,6 +30,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/pkg/profile"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
@@ -162,6 +163,8 @@ func main() {
 		prometheusDSN = kingpin.Flag("prometheus-dsn", "Prometheus DSN").Default("tcp://127.0.0.1:9000/?database=prometheus").String()
 		storageTypeF  = kingpin.Flag("storage-type", "Storage type").Default("clickhouse").String()
 		logLevelF     = kingpin.Flag("log.level", "Log level").Default("warn").String()
+		memProfile    = kingpin.Flag("profile.mem", "Enable memory profiling").Bool()
+		cpuProfile    = kingpin.Flag("profile.cpu", "Enable cpu profiling").Bool()
 	)
 	kingpin.CommandLine.HelpFlag.Short('h')
 	kingpin.Parse()
@@ -171,6 +174,12 @@ func main() {
 		logrus.Fatal(err)
 	}
 	logrus.SetLevel(level)
+	if *cpuProfile {
+	  defer profile.Start().Stop()
+	}
+	if *memProfile {
+	  defer profile.Start(profile.MemProfile).Stop()
+	}
 
 	l := logrus.WithField("component", "main")
 	ctx, cancel := context.WithCancel(context.Background())

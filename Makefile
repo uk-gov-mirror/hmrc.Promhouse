@@ -10,6 +10,7 @@ init:   		## Install dependencies
 	go get -u github.com/AlekSi/gocoverutil
 	go get -u golang.org/x/perf/cmd/benchstat
 	go get -u github.com/dvyukov/go-fuzz/...
+	go get -u github.com/pkg/profile
 	go get -u gopkg.in/alecthomas/gometalinter.v2
 	gometalinter.v2 --install
 
@@ -37,6 +38,15 @@ bench: install   	## Install and bench test
 
 run: install 		## Install and run promhouse
 	go run ./cmd/promhouse/*.go --log.level=info
+
+run-memprofile: install ## Run with memory profiling enabled. It will generate a pprof file readable by go tool pprof. NOTE: promhouse binary needs to be in your PATH
+	promhouse --log.level=info --profile.mem
+
+run-cpuprofile: install ## Run with memory profiling enabled. It will generate a pprof file readable by go tool pprof. NOTE: promhouse binary needs to be in your PATH
+	promhouse ./cmd/promhouse/*.go --log.level=info --profile.cpu
+
+valgrind: install       ## Install and run promhouse with valgrind
+	valgrind --tool=memcheck go run ./cmd/promhouse/*.go --log.level=info
 
 run-race: install-race  ## Install and race run
 	go run -race ./cmd/promhouse/*.go --log.level=info
