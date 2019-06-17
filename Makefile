@@ -61,11 +61,25 @@ gofuzz: test            ## Go-fuzz
 	go-fuzz-build -func=FuzzJSON -o=json-fuzz.zip github.com/hmrc/Promhouse/storages/clickhouse
 	go-fuzz -bin=json-fuzz.zip -workdir=go-fuzz/json
 
-up:			## Starts the test environment (Linux)
+up-test-env:	        ## Starts the test environment - no promhouse (Linux)
+	cp ${GOPATH}/bin/promhouse misc/promhouse_bin
 	docker-compose -f misc/docker-compose-linux.yml -p promhouse up --force-recreate --abort-on-container-exit --renew-anon-volumes --remove-orphans
 
-up-mac:                 ## Starts the test environment (Mac)
+up-mac-test-env:        ## Starts the test environment - no promhouse (Mac)
 	docker-compose -f misc/docker-compose-mac.yml -p promhouse up --force-recreate --abort-on-container-exit --renew-anon-volumes --remove-orphans
+
+up: install		## Starts the test environment - with promhouse (Linux)
+	rm -f misc/promhouse_bin
+	cp ${GOPATH}/bin/promhouse misc/promhouse_bin
+	docker-compose -f misc/docker-compose-linux.yml -f misc/docker-compose-promhouse.yml -p promhouse up --force-recreate --abort-on-container-exit --renew-anon-volumes --remove-orphans
+
+up-mac: install         ## Starts the test environment - with promhouse (Mac)
+	rm -f misc/promhouse_bin
+	cp ${GOPATH}/bin/promhouse misc/promhouse_bin
+	docker-compose -f misc/docker-compose-mac.yml -f misc/docker-compose-promhouse.yml -p promhouse up --force-recreate --abort-on-container-exit --renew-anon-volumes --remove-orphans
+
+generate-load:          ## generates metrics in a running test environment with avalanch
+	docker run --net=host quay.io/freshtracks.io/avalanche
 
 down:                   ## Stops the test environment (Linux)
 	docker-compose -f misc/docker-compose-linux.yml -p promhouse down --volumes --remove-orphans
