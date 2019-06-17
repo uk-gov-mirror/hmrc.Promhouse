@@ -1,0 +1,24 @@
+---
+version: '3'
+services:
+  promhouse:
+    container_name: promhouse
+    image: golang
+    ports:
+      - 127:0.0.1:7781:7781
+      - 127:0.0.1:7782:7782
+    network_mode: host
+    volumes:
+      - ./promhouse_bin:/promhouse_bin
+    entrypoint: "/promhouse_bin"
+    command: ["--log.level=info"]
+    depends_on:
+      - grafana
+      - prometheus
+      - clickhouse_exporter
+      - clickhouse
+      - node_exporter
+    deploy:
+      resources:
+        limits:
+          memory: 2.5G

@@ -92,6 +92,31 @@ You can now use [pprof](https://github.com/google/pprof) to read the data. The q
 go tool pprof --pdf ${GOPATH}/bin/promhouse /tmp/profile382238388/mem.pprof > profilegraph.pdf
 ```
 
+## Manually testing load
+If you want to see how Prometheus and PromHouse behave under load,
+1. Start up the test environment in a terminal. To do that, run:
+```bash
+make up
+```
+This will start all the test environment (grafana, prometheus...) and promhouse.
+2. Generate some load. In another terminal run:
+```bash
+make generate-load
+```
+This will start up a docker container with Avalanch, and will generate metrics (default settings).
+
+### Graph what is going on
+You can go to the Prometheus console to see what is going on, in `http://127.0.0.1:9090/graph`.
+Under graph, you can add serveral graphs and see what is happening
+Useful queries to graph are:
+1. `process_resident_memory_bytes` : to see how much memory each of the components is using. PromHouse and Prometheus will most likely be the highest consumers
+NOTE: you have limits defined in the compose file. They are set to a maximum of 2.5GB for each one. If it is too much or too little, you can modify them.
+2. `scrape_samples_scraped`: to visualize how many samples have been processed.
+3. `prometheus_remote_storage_queue_length`: to see the PromHouse queue size.
+4. `rate(clickhouse_insert_query_total[1m])`: to see the insert rate per minute (how many inserts are sent to clickhouse).
+5. `rate(clickhouse_inserted_rows_total[1m])`: to see the rate of rows inserted in clickhouse.
+6. `prometheus_remote_storage_dropped_samples_total`: to monitor if any samples are dropped.
+
 ## Database Schema
 
 ```sql
