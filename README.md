@@ -93,10 +93,14 @@ go tool pprof --pdf ${GOPATH}/bin/promhouse /tmp/profile382238388/mem.pprof > pr
 ```
 
 ## Manually testing load
-If you want to see how Prometheus and PromHouse behave under load,
-1. Start up the test environment in a terminal. To do that, run:
+If you want to see how Prometheus and PromHouse behave under load. You don't have any dependencies (not go or anything else) apart from docker and compose.
+1. Build the binaries and start up up the test environment in a terminal. To do that, run:
 ```bash
 make up
+```
+or if you are in mac:
+```bash
+make up-mac
 ```
 This will start all the test environment (grafana, prometheus...) and promhouse.
 2. Generate some load. In another terminal run:
