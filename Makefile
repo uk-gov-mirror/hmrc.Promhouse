@@ -68,14 +68,14 @@ up-test-env:	        ## Starts the test environment - no promhouse (Linux)
 up-mac-test-env:        ## Starts the test environment - no promhouse (Mac)
 	docker-compose -f misc/docker-compose-mac.yml -p promhouse up --force-recreate --abort-on-container-exit --renew-anon-volumes --remove-orphans
 
-up: install		## Starts the test environment - with promhouse (Linux)
+up: build		## Starts the test environment - with promhouse (Linux)
 	rm -f misc/promhouse_bin
-	cp ${GOPATH}/bin/promhouse misc/promhouse_bin
+	cp promhouse misc/promhouse_bin
 	docker-compose -f misc/docker-compose-linux.yml -f misc/docker-compose-promhouse.yml -p promhouse up --force-recreate --abort-on-container-exit --renew-anon-volumes --remove-orphans
 
-up-mac: install         ## Starts the test environment - with promhouse (Mac)
+up-mac: build         ## Starts the test environment - with promhouse (Mac)
 	rm -f misc/promhouse_bin
-	cp ${GOPATH}/bin/promhouse misc/promhouse_bin
+	cp promhouse misc/promhouse_bin
 	docker-compose -f misc/docker-compose-mac.yml -f misc/docker-compose-promhouse.yml -p promhouse up --force-recreate --abort-on-container-exit --renew-anon-volumes --remove-orphans
 
 generate-load:          ## generates metrics in a running test environment with avalanch

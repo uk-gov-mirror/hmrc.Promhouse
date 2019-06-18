@@ -12,10 +12,6 @@ make protos
 echo "Build"
 make install
 
-echo "Test"
-
-make test
-
 echo "Copying binaries"
 cp /go/bin/prom* /go/src/github.com/hmrc/Promhouse/
 
