@@ -76,7 +76,7 @@ up: build		## Starts the test environment - with promhouse (Linux)
 up-mac: build         ## Starts the test environment - with promhouse (Mac)
 	rm -f misc/promhouse_bin
 	cp promhouse misc/promhouse_bin
-	docker-compose -f misc/docker-compose-mac.yml -f misc/docker-compose-promhouse.yml -p promhouse up --force-recreate --abort-on-container-exit --renew-anon-volumes --remove-orphans
+	docker-compose -f misc/docker-compose-mac.yml -f misc/docker-compose-promhouse-mac.yml -p promhouse up --force-recreate --abort-on-container-exit --renew-anon-volumes --remove-orphans
 
 generate-load:          ## generates metrics in a running test environment with avalanch
 	docker run --net=host quay.io/freshtracks.io/avalanche
