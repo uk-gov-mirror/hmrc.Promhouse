@@ -10,8 +10,8 @@ services:
     network_mode: host
     volumes:
       - ./promhouse_bin:/promhouse_bin
-    entrypoint: "/promhouse_bin"
-    command: ["--log.level=info"]
+      - ./waitforit.sh:/waitforit.sh
+    entrypoint: "/waitforit.sh -s -t 30 -h 127.0.0.1 -p 9000 -- /promhouse_bin --log.level=info"
     depends_on:
       - grafana
       - prometheus
