@@ -10,7 +10,7 @@ PromHouse is a long-term remote storage with built-in clustering and downsamplin
 Feel free to ~~like, share, retweet,~~ star and watch it, but **do not use it in production** yet.
 
 ## Generating the binaries
-If you just want the binaries to play around with, run
+If you just want the binaries to play around with, run: (no local dependencies)
 ```
 bash make build
 ```
@@ -31,6 +31,7 @@ export PATH="${GOPATH}/bin:$PATH"
 5. You are good to go!
 
 ## Compiling
+NOTE: you don't need to compile it locally to run it (or to run performance tests)
 1. make init
 2. make protos
 3. make install
@@ -39,9 +40,9 @@ export PATH="${GOPATH}/bin:$PATH"
 You need the test environment up to run the tests
 1. In a terminal run:
 ```
-make up
+make up-test-env
 ```
-2. In a different terminal run:
+2. In a different terminal run (or run it manually if you want a to attach a debugger):
 ```
 make run
 ```
@@ -66,6 +67,7 @@ brew install graphviz
 ```
 
 ### Generate the profiling data
+Make sure you have a test enviroment up and running, and that you can locally build promhouse.
 Run promhouse with either cpu or mem profiling enabled by running it with:
 ```bash
 make run-memprofile
