@@ -152,6 +152,31 @@ func New(params *Params) (base.Storage, error) {
 	return ch, nil
 }
 
+func (ch *clickHouse) query (q string) (map[uint64][]*prompb.Label, error) {
+	timeSeries := make(map[uint64][]*prompb.Label, len(ch.timeSeries))
+	ch.l.Debug(q)
+	rows, err := ch.db.Query(q)
+	if err != nil {
+		return timeSeries, err
+	}
+	defer rows.Close()
+
+	var f uint64
+	var b []byte
+	for rows.Next() {
+		if err = rows.Scan(&f, &b); err != nil {
+			return timeSeries, err
+		}
+		if _, ok := timeSeries[f]; !ok {
+		    if timeSeries[f], err = unmarshalLabels(b); err != nil {
+			return timeSeries, err
+		    }
+		}
+	}
+	return timeSeries, rows.Err()
+}
+
+
 func (ch *clickHouse) runTimeSeriesReloader(ctx context.Context) {
 	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
@@ -159,29 +184,8 @@ func (ch *clickHouse) runTimeSeriesReloader(ctx context.Context) {
 	q := fmt.Sprintf(`SELECT DISTINCT fingerprint, labels FROM %s.time_series`, ch.database)
 	for {
 		ch.timeSeriesRW.RLock()
-		timeSeries := make(map[uint64][]*prompb.Label, len(ch.timeSeries))
 		ch.timeSeriesRW.RUnlock()
-
-		err := func() error {
-			ch.l.Debug(q)
-			rows, err := ch.db.Query(q)
-			if err != nil {
-				return err
-			}
-			defer rows.Close()
-
-			var f uint64
-			var b []byte
-			for rows.Next() {
-				if err = rows.Scan(&f, &b); err != nil {
-					return err
-				}
-				if timeSeries[f], err = unmarshalLabels(b); err != nil {
-					return err
-				}
-			}
-			return rows.Err()
-		}()
+		timeSeries, err := ch.query(q)
 		if err == nil {
 			ch.timeSeriesRW.Lock()
 			n := len(timeSeries) - len(ch.timeSeries)
