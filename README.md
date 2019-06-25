@@ -88,10 +88,33 @@ NOTE: the promhouse binary needs to be in your path. That would probably look li
 export PATH="${GOPATH}/bin:$PATH"
 ```
 
+There is an http endpoint that exposes all of the profiling data in Registered handlers: http://127.0.0.1:7782/debug/pprof  component=debug
+The automatic genration of the pprof file fails sometimes, but generating that file is really easy, you just need to:
+```bash
+curl  http://127.0.0.1:7782/debug/pprof/heap > heap.0.pprof
+```
+You can go to http://127.0.0.1:7782/debug/pprof/ to see all the profiling data available.
+
 ### Graph the gathered data
 You can now use [pprof](https://github.com/google/pprof) to read the data. The quickest way I found is to generate a pdf:
 ```bash
 go tool pprof --pdf ${GOPATH}/bin/promhouse /tmp/profile382238388/mem.pprof > profilegraph.pdf
+```
+You can also use the interactive tool to inspect the data:
+```bash
+go tool pprof heap.2.pprof
+```
+To display the functions using more memory, run:
+```bash
+top10
+```
+You can generate the pdf graph of the data with:
+```bash
+pdf
+```
+You can see the details of the memory usage in a particular function with:
+```bash
+list <functionName>
 ```
 
 ## Manually testing load
@@ -122,6 +145,8 @@ NOTE: you have limits defined in the compose file. They are set to a maximum of 
 4. `rate(clickhouse_insert_query_total[1m])`: to see the insert rate per minute (how many inserts are sent to clickhouse).
 5. `rate(clickhouse_inserted_rows_total[1m])`: to see the rate of rows inserted in clickhouse.
 6. `prometheus_remote_storage_dropped_samples_total`: to monitor if any samples are dropped.
+
+The url to display the metrics above is http://127.0.0.1:9090/graph?g0.range_input=1h&g0.expr=process_resident_memory_bytes&g0.tab=0&g1.range_input=1h&g1.expr=scrape_samples_scraped&g1.tab=0&g2.range_input=1h&g2.expr=prometheus_remote_storage_queue_length&g2.tab=0&g3.range_input=1h&g3.expr=rate(clickhouse_insert_query_total%5B1m%5D)&g3.tab=0&g4.range_input=1h&g4.expr=rate(clickhouse_inserted_rows_total%5B1m%5D)&g4.tab=0&g5.range_input=1h&g5.expr=prometheus_remote_storage_dropped_samples_total&g5.tab=0
 
 ## Database Schema
 
